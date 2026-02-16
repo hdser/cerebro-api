@@ -80,6 +80,8 @@ nano .env
 | `CLICKHOUSE_SECURE` | Use HTTPS | `true` |
 | `DBT_MANIFEST_URL` | URL to your live `manifest.json` | `https://gnosischain.github.io/dbt-cerebro/manifest.json` |
 | `DBT_MANIFEST_PATH` | Fallback local path | `./manifest.json` |
+| `DBT_MANIFEST_REFRESH_ENABLED` | Enable automatic manifest refresh | `true` |
+| `DBT_MANIFEST_REFRESH_INTERVAL_SECONDS` | Refresh interval in seconds | `300` |
 
 ### 4. Configure API Keys
 
@@ -365,8 +367,21 @@ volumes:
 | `CLICKHOUSE_SECURE` | No | `true` | Use HTTPS connection |
 | `DBT_MANIFEST_URL` | No | GitHub Pages URL | Remote manifest URL |
 | `DBT_MANIFEST_PATH` | No | `./manifest.json` | Local manifest fallback |
+| `DBT_MANIFEST_REFRESH_ENABLED` | No | `true` | Enable automatic manifest refresh |
+| `DBT_MANIFEST_REFRESH_INTERVAL_SECONDS` | No | `300` | Refresh interval in seconds |
 | `API_KEYS_FILE` | No | `./api_keys.json` | Path to API keys file |
 | `DEFAULT_ENDPOINT_TIER` | No | `tier0` | Default tier for untagged endpoints |
+
+### Manifest Refresh
+
+The API polls the manifest URL automatically and rebuilds routes when it changes.
+
+You can force an immediate refresh with a tier3 API key:
+
+```bash
+curl -X POST http://localhost:8000/v1/system/manifest/refresh \
+  -H 'X-API-Key: sk_live_internal_admin'
+```
 
 ### API Keys File Format
 

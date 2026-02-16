@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     DBT_MANIFEST_URL: Optional[str] = "https://gnosischain.github.io/dbt-cerebro/manifest.json"
     DBT_MANIFEST_PATH: str = "./manifest.json"
     API_CONFIG_PATH: str = "./api_config.yaml"
+    DBT_MANIFEST_REFRESH_ENABLED: bool = True
+    DBT_MANIFEST_REFRESH_INTERVAL_SECONDS: int = 300
     
     # API Keys file path (JSON file with user keys)
     API_KEYS_FILE: str = "./api_keys.json"

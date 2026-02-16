@@ -395,4 +395,5 @@ class DynamicRouter:
         print(f"  ✅ {url_path} -> {model_name} [{required_tier}]")
 
 
-router = DynamicRouter().router
+def build_router() -> APIRouter:
+    return DynamicRouter().router

@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 from app.config import settings
-from app.factory import router as dynamic_router
+from app.router_manager import RouterManager
+from app.security import get_api_key, check_tier_access
 
 description = """
 **Gnosis Cerebro API** - Data API dynamically generated from the `dbt-cerebro` manifest.
@@ -25,8 +26,18 @@ app = FastAPI(
     description=description
 )
 
-# Register the Dynamic Router
-app.include_router(dynamic_router, prefix="/v1")
+router_manager = RouterManager(app)
+router_manager.install_initial_routes()
+
+
+@app.on_event("startup")
+async def _startup():
+    router_manager.start_background_refresh()
+
+
+@app.on_event("shutdown")
+async def _shutdown():
+    await router_manager.stop_background_refresh()
 
 @app.get("/", tags=["System"])
 def root():
@@ -35,6 +46,12 @@ def root():
         "service": settings.API_TITLE,
         "docs": "/docs"
     }
+
+
+@app.post("/v1/system/manifest/refresh", tags=["System"])
+async def refresh_manifest(user_info=Depends(get_api_key)):
+    check_tier_access(user_info, "tier3", "/v1/system/manifest/refresh")
+    return await router_manager.refresh_async()
 
 if __name__ == "__main__":
     import uvicorn
